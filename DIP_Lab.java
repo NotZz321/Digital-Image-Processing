@@ -1,10 +1,16 @@
+
+import java.awt.Point;
+
 public class DIP_Lab {
 
     public static void main(String[] args) {
         ImageManager im = new ImageManager();
         
         // Mandril
-        im.read("images/mandril.bmp");
+        // im.read("images/mandril.bmp");
+
+        // Mandril black&white
+        im.read("images/mandrilB.bmp");
 
         // Rect 1
         // im.read("images/Rect1.bmp");
@@ -27,7 +33,8 @@ public class DIP_Lab {
         // quest8_Rect3(im);
         // quest9(im);
         // quest10(im);
-        quest11(im);
+        // quest11(im);
+        quest12(im);
     }
 
     public static void quest1(ImageManager im) {
@@ -174,5 +181,41 @@ public class DIP_Lab {
 
         im.resizeBilinear(0.35, 0.35);
         im.write("images/0_35scaleMandril.bmp");
+    }
+
+    public static void quest12(ImageManager im) {
+        ImageManager.StructuringElement se = im.new StructuringElement(3, 3, new Point(1, 1));
+        ImageManager im2 = new ImageManager();
+        im2.read("images/mandrilB.bmp");
+        for (int i = 0; i < se.height; i++) {
+            for (int j = 0; j < se.width; j++) {
+                se.elements[j][i] = 255;
+            }
+        }
+
+        im2.erosion(se);
+        
+        for (int y = 0; y < im.height; y++) {
+            for (int x = 0; x < im.width; x++) {
+                int origin = im.getRGB(x, y);
+                int originR = (origin >> 16) & 0xFF;
+                int originG = (origin >> 8) & 0xFF;
+                int originB = origin & 0xFF;
+
+                int erosed = im2.getRGB(x, y);
+                int erosedR = (erosed >> 16) & 0xFF;
+                int erosedG = (erosed >> 8) & 0xFF;
+                int erosedB = erosed & 0xFF;
+
+                int newR = Math.max(originR - erosedR, 0);
+                int newG = Math.max(originG - erosedG, 0);
+                int newB = Math.max(originB - erosedB, 0);
+                int newColor = (newR << 16) | (newG << 8) | newB;
+                im.setRGB(x, y, newColor);
+            }
+        }
+
+        im.write("images/mandrilBoundary.bmp");
+        
     }
 }
