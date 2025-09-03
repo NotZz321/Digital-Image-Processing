@@ -1324,6 +1324,65 @@ class ImageManager {
         }
     }
     
+    public void dilation (StructuringElement se) {
+        if (img == null) return;
+
+        convertToGrayscale();
+
+        BufferedImage tempBuf = new BufferedImage(width, height, img.getType());
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                boolean isDialated = false;
+                se_check: for (int i = y - (se.height - se.origin.y - 1); i < y + se.height - (se.height - se.origin.y - 1); i++) {
+                    for (int j = x - (se.width - se.origin.x - 1); j < x + se.width - (se.width - se.origin.x - 1); j++) {
+                        int seCurrentX = se.width - (j - x + se.origin.x) - 1;
+                        int seCurrentY = se.height - (i - y + se.origin.y) - 1;
+
+                        if (i >= 0 && i < height && j >= 0 && j < width) {
+                            if (!se.ignoreElements.contains(new Point(seCurrentX, seCurrentY))) {
+                                int color = img.getRGB(j, i);
+                                int gray = color & 0xff;
+
+                                if (se.elements[seCurrentX][seCurrentY] == gray) {
+                                    isDialated = true;
+                                    break se_check;
+                                }
+                            }
+                        } else {
+                            isDialated = false;
+                            break se_check;
+                        }
+                    }
+                }
+
+                if (isDialated) {
+                    int max = Integer.MIN_VALUE;
+                    
+                    for (int i = y - (se.height - se.origin.y - 1); i < y + se.height - (se.height - se.origin.y - 1); i++) {
+                        for (int j = x - (se.width - se.origin.x - 1); j < x + se.width - (se.width - se.origin.x - 1); j++) {
+                            if (i >= 0 && i < height && j >= 0 && j < width) {
+                                int color = img.getRGB(j, i);
+                                int gray = color & 0xff;
+
+                                if (max < gray) max = gray;
+                            }
+                        }
+                    }
+
+                    int newGray = max;
+                    int newColor = (newGray << 16) | (newGray << 8) | newGray;
+                    tempBuf.setRGB(x, y, newColor);
+                }
+            }
+        }
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                img.setRGB(x, y, tempBuf.getRGB(x, y));
+            }
+        }
+    }
 
     class StructuringElement {
         public int[][] elements;
