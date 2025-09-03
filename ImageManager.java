@@ -1,7 +1,9 @@
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import javax.imageio.ImageIO;
 
@@ -1268,4 +1270,84 @@ class ImageManager {
             }
         }
     }
+
+    public void erosion(StructuringElement se) {
+        if (img == null) return;
+
+        convertToGrayscale();
+
+        BufferedImage tempBuf = new BufferedImage(width, height, img.getType());
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                boolean isEroded = true;
+                int min = Integer.MAX_VALUE;
+
+                se_check: for (int i = y - se.origin.y; i < y + se.height - se.origin.y; i++) {
+                    for (int j = x - se.origin.x; j < x + se.width - se.origin.x; j++) {
+                        int seCurrentX = j - (x - se.origin.x);
+                        int seCurrentY = i - (y - se.origin.y);
+
+                        if (i >= 0 && i < height && j >= 0 && j < width) {
+                            if (!se.igneoreElements.contains(new Point(seCurrentX, seCurrentY))) {
+                                int color = img.getRGB(j, i);
+                                int gray = color & 0xff;
+
+                                if (se.elements[seCurrentX][seCurrentY] != gray) {
+                                    isEroded = false;
+                                    break se_check;
+                                }
+                                else if (min > gray) min = gray;
+                                }
+                        } else {
+                            isEroded = false;
+                            break se_check;
+                        }
+                    }
+                }
+
+                int newGray = 0;
+
+                if (isEroded) {
+                    newGray = min;
+                }
+
+                int newColor = (newGray << 16) | (newGray << 8) | newGray;
+                tempBuf.setRGB(x, y, newColor);
+            }
+        }
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                img.setRGB(x, y, tempBuf.getRGB(x, y));
+            }
+        }
+    }
+    
+
+    class StructuringElement {
+        public int[][] elements;
+
+        public int width, height;
+        public Point origin;
+        
+        public ArrayList<Point> igneoreElements;
+
+        public StructuringElement(int width, int height, Point origin) {
+            this.width = width;
+            this.height = height;
+
+            // check boundary
+            if (origin.x < 0 || origin.x >= width ||
+                origin.y < 0 || origin.y >= height) {
+                    this.origin = new Point();
+            } else {
+                this.origin = new Point(origin); 
+            }
+
+            igneoreElements = new ArrayList<>();
+            elements = new int[width][height];
+        }
+    }
+
 }
