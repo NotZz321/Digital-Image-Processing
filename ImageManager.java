@@ -1289,7 +1289,7 @@ class ImageManager {
                         int seCurrentY = i - (y - se.origin.y);
 
                         if (i >= 0 && i < height && j >= 0 && j < width) {
-                            if (!se.igneoreElements.contains(new Point(seCurrentX, seCurrentY))) {
+                            if (!se.ignoreElements.contains(new Point(seCurrentX, seCurrentY))) {
                                 int color = img.getRGB(j, i);
                                 int gray = color & 0xff;
 
@@ -1330,8 +1330,8 @@ class ImageManager {
 
         public int width, height;
         public Point origin;
-        
-        public ArrayList<Point> igneoreElements;
+
+        public ArrayList<Point> ignoreElements;
 
         public StructuringElement(int width, int height, Point origin) {
             this.width = width;
@@ -1345,9 +1345,8 @@ class ImageManager {
                 this.origin = new Point(origin); 
             }
 
-            igneoreElements = new ArrayList<>();
+            ignoreElements = new ArrayList<>();
             elements = new int[width][height];
         }
     }
-
 }
