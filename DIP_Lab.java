@@ -7,10 +7,10 @@ public class DIP_Lab {
         ImageManager im = new ImageManager();
         
         // Mandril
-        // im.read("images/mandril.bmp");
+        im.read("images/mandril.bmp");
 
         // Mandril black&white
-        im.read("images/mandrilB.bmp");
+        // im.read("images/mandrilB.bmp");
 
         // Rect 1
         // im.read("images/Rect1.bmp");
@@ -34,7 +34,9 @@ public class DIP_Lab {
         // quest9(im);
         // quest10(im);
         // quest11(im);
-        quest12(im);
+        // quest12(im);
+        // quest13(im);
+        quest14(im);
     }
 
     public static void quest1(ImageManager im) {
@@ -218,4 +220,16 @@ public class DIP_Lab {
         im.write("images/mandrilBoundary.bmp");
         
     }
+
+    public static void quest13(ImageManager im) {
+        im.cannyEdgeDetection(100, 180);
+        im.write("images/mandrilCannyEdge.bmp");
+    }
+
+    public static void quest14(ImageManager im) {
+        im.cannyEdgeDetection(48, 128);
+        im.houghTransform(0.5);
+        im.write("images/mandrilHoughLines.bmp");
+    }
+
 }
