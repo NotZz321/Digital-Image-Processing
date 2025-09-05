@@ -7,7 +7,7 @@ public class DIP_Lab {
         ImageManager im = new ImageManager();
         
         // Mandril
-        im.read("images/mandril.bmp");
+        // im.read("images/mandril.bmp");
 
         // Mandril black&white
         // im.read("images/mandrilB.bmp");
@@ -23,6 +23,9 @@ public class DIP_Lab {
 
         // motion
         // im.read("images/images/4/motion01.512.bmp");
+
+        // qr
+        im.read("images/qrcode.bmp");
 
         // quest1(im);
         // quest2(im);
@@ -41,7 +44,8 @@ public class DIP_Lab {
         // quest13(im);
         // quest14(im);
         // quest15(im);
-        quest16(im);
+        // quest16(im);
+        quest17_quest18(im);
     }
 
     public static void quest1(ImageManager im) {
@@ -263,4 +267,31 @@ public class DIP_Lab {
         im.write("images/mandrilHarrisFeatures2000.bmp");
     }
 
+    public static void quest17_quest18(ImageManager im) {
+        double[][] srcPoints = {
+            {256, 133}, // top-left
+            {419, 146}, // top-right
+            {403, 348}, // bottom-right
+            {244, 320} // bottom-left
+        };
+
+        double[][] dstPoints = {
+            {0, 0}, // top-left
+            {512, 0}, // top-right
+            {512, 512}, // bottom-right
+            {0, 512} // bottom-left
+        };
+
+        double[] homography = im.calculateHomography(srcPoints, dstPoints);
+        System.out.println("Homography Matrix: ");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.printf("%f ", homography[i * 3 + j]);
+            }
+            System.out.println();
+        }
+        
+        im.applyHomography(homography);
+        im.write("images/qrRectified.bmp");
+    }
 }
