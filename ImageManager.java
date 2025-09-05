@@ -1384,6 +1384,81 @@ class ImageManager {
         }
     }
 
+    public void thresholding(int threshold) {
+        if (img == null) return;
+
+        convertToGrayscale();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int color = img.getRGB(x, y);
+                int gray = color & 0xff;
+
+                gray = gray < threshold? 0: 255;
+
+                color = (gray << 16) | (gray << 8) | gray;
+
+                img.setRGB(x, y, color);
+            }   
+        }
+    }
+
+    public void otsuThresholding() {
+        if (img == null) return;
+
+        convertToGrayscale();
+
+        int[] histogram = new int[256];
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int color = img.getRGB(x, y);
+                int gray = color & 0xff;
+
+                histogram[gray]++;
+            }
+        }
+
+        float[] histogramNorm = new float[histogram.length];
+        float totalPixel = width * height;
+
+        for (int i = 0; i < histogramNorm.length; i++) {
+            histogramNorm[i] = histogram[i] / totalPixel;
+        }
+
+        float[] histogramCS = new float[256];
+        float[] histogramMean = new float[256];
+
+        for (int i = 0; i < 256; i++) {
+            if (i == 0) {
+                histogramCS[i] = histogramNorm[i];
+                histogramMean[i] = 0;
+            } else {
+                histogramCS[i] = histogramCS[i - 1] + histogramNorm[i];
+                histogramMean[i] = histogramMean[i - 1] + histogramNorm[i] * i;
+            }
+        }
+
+        float globalMean = histogramMean[255];
+        float max = Float.MIN_VALUE;
+        float maxVariance = 0;
+        int countMax = 0;
+
+        for (int i = 0; i < 256; i++) {
+            float variance = (float) Math.pow(globalMean * histogramCS[i] - histogramMean[i], 2) / (histogramCS[i] * (1 - histogramCS[i]));
+
+            if (variance > maxVariance) {
+                maxVariance = variance;
+                max = i;
+                countMax = 1;
+            } else if (variance == maxVariance) {
+                countMax++;
+                max = ((max * (countMax - 1)) + i) / countMax;
+            }
+        }
+        thresholding((int) Math.round(max));
+    }
+
     class StructuringElement {
         public int[][] elements;
 
