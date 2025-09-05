@@ -27,10 +27,10 @@ class ImageManager {
         original = new BufferedImage(width, height, img.getType());
     }
 
-    public boolean read(String fileName){
+    public boolean read(String fileName) {
         try {
             img = ImageIO.read(new File(fileName));
-            
+
             width = img.getWidth();
             height = img.getHeight();
             bitDepth = img.getColorModel().getPixelSize();
@@ -41,12 +41,13 @@ class ImageManager {
                     original.setRGB(x, y, img.getRGB(x, y));
                 }
             }
-            System.out.println("Image " + fileName + " with "+ width + " x " + height + " pixels(" + bitDepth + " bits per pixel) has been read!");
+            System.out.println("Image " + fileName + " with " + width + " x " + height + " pixels(" + bitDepth
+                    + " bits per pixel) has been read!");
             return true;
         } catch (IOException e) {
             System.out.println(e);
-            return false;   
-        } 
+            return false;
+        }
     }
 
     public boolean write(String fileName) {
@@ -78,7 +79,7 @@ class ImageManager {
         }
     }
 
-    public void setRGB(int x , int y, int rgb) {
+    public void setRGB(int x, int y, int rgb) {
         img.setRGB(x, y, rgb);
     }
 
@@ -87,7 +88,7 @@ class ImageManager {
     }
 
     // public int clamp(int value) {
-    //     return Math.max(0, Math.min(255, value));
+    // return Math.max(0, Math.min(255, value));
     // }
 
     public void restoreToOriginal() {
@@ -95,7 +96,7 @@ class ImageManager {
         height = original.getHeight();
 
         img = new BufferedImage(width, height, img.getType());
-        
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 img.setRGB(x, y, original.getRGB(x, y));
@@ -103,11 +104,12 @@ class ImageManager {
         }
     }
 
-    public void convertToRed(){
-        if(img == null) return;
+    public void convertToRed() {
+        if (img == null)
+            return;
 
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 int color = img.getRGB(x, y);
                 int r = (color >> 16) & 0xFF;
 
@@ -117,11 +119,12 @@ class ImageManager {
         }
     }
 
-    public void convertToGreen(){
-        if(img == null) return;
+    public void convertToGreen() {
+        if (img == null)
+            return;
 
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 int color = img.getRGB(x, y);
                 int g = (color >> 8) & 0xFF;
 
@@ -131,11 +134,12 @@ class ImageManager {
         }
     }
 
-    public void convertToBlue(){
-        if(img == null) return;
+    public void convertToBlue() {
+        if (img == null)
+            return;
 
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 int color = img.getRGB(x, y);
                 int b = color & 0xFF;
 
@@ -145,11 +149,12 @@ class ImageManager {
         }
     }
 
-    public void convertToGreenBlue(){
-        if(img == null) return;
+    public void convertToGreenBlue() {
+        if (img == null)
+            return;
 
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 int color = img.getRGB(x, y);
                 int g = (color >> 8) & 0xFF;
                 int b = color & 0xFF;
@@ -160,11 +165,12 @@ class ImageManager {
         }
     }
 
-    public void convertToGrayscale(){
-        if(img == null) return;
+    public void convertToGrayscale() {
+        if (img == null)
+            return;
 
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 int color = img.getRGB(x, y);
                 int r = (color >> 16) & 0xFF;
                 int g = (color >> 8) & 0xFF;
@@ -178,7 +184,8 @@ class ImageManager {
     }
 
     public float getContrast() {
-        if (img == null) return 0;
+        if (img == null)
+            return 0;
 
         float contrast = 0;
 
@@ -200,12 +207,13 @@ class ImageManager {
                 contrast += Math.pow((value) - avgIntensity, 2);
             }
         }
-        contrast = (float)Math.sqrt(contrast / pixelNum);
+        contrast = (float) Math.sqrt(contrast / pixelNum);
         return contrast;
     }
 
     public void adjustContrast(float contrast) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         float currentContrast = getContrast();
 
@@ -221,10 +229,10 @@ class ImageManager {
 
         float min = avgIntensity - currentContrast;
         float max = avgIntensity + currentContrast;
-        
+
         float newMin = avgIntensity - currentContrast - contrast / 2;
         float newMax = avgIntensity + currentContrast + contrast / 2;
-        
+
         newMin = newMin < 0 ? 0 : newMin;
         newMax = newMax < 0 ? 0 : newMax;
         newMin = newMin > 255 ? 255 : newMin;
@@ -245,15 +253,15 @@ class ImageManager {
                 int g = (color >> 8) & 0xff;
                 int b = color & 0xff;
 
-                r = (int)((r - min) * contrastFactor + newMin);
+                r = (int) ((r - min) * contrastFactor + newMin);
                 r = r > 255 ? 255 : r;
                 r = r < 0 ? 0 : r;
 
-                g = (int)((g - min) * contrastFactor + newMin);
+                g = (int) ((g - min) * contrastFactor + newMin);
                 g = g > 255 ? 255 : g;
                 g = g < 0 ? 0 : g;
 
-                b = (int)((b - min) * contrastFactor + newMin);
+                b = (int) ((b - min) * contrastFactor + newMin);
                 b = b > 255 ? 255 : b;
                 b = b < 0 ? 0 : b;
 
@@ -265,26 +273,27 @@ class ImageManager {
     }
 
     public void adjustBrightness(int brightness) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int color = img.getRGB(x,y);
+                int color = img.getRGB(x, y);
                 int r = (color >> 16) & 0xff;
                 int g = (color >> 8) & 0xff;
                 int b = color & 0xff;
 
                 r = r + brightness;
-                r = r > 255? 255: r;
-                r = r < 0? 0: r;
+                r = r > 255 ? 255 : r;
+                r = r < 0 ? 0 : r;
 
                 g = g + brightness;
-                g = g > 255? 255: g;
-                g = g < 0? 0: g;
+                g = g > 255 ? 255 : g;
+                g = g < 0 ? 0 : g;
 
                 b = b + brightness;
-                b = b > 255? 255: b;
-                b = b < 0? 0: b;
+                b = b > 255 ? 255 : b;
+                b = b < 0 ? 0 : b;
 
                 color = (r << 16) | (g << 8) | b;
 
@@ -294,10 +303,11 @@ class ImageManager {
     }
 
     public void invert() {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         for (int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
+            for (int x = 0; x < width; x++) {
                 int color = img.getRGB(x, y);
                 int r = (color >> 16) & 0xff;
                 int g = (color >> 8) & 0xff;
@@ -315,26 +325,27 @@ class ImageManager {
     }
 
     public void powerLaw(double c, double gamma) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         for (int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
+            for (int x = 0; x < width; x++) {
                 int color = img.getRGB(x, y);
                 int r = (color >> 16) & 0xff;
                 int g = (color >> 8) & 0xff;
                 int b = color & 0xff;
 
-                r = (int)(c * Math.pow(r / 255f, gamma) * 255f);
-                r = r > 255? 255: r;
-                r = r < 0? 0: r;
+                r = (int) (c * Math.pow(r / 255f, gamma) * 255f);
+                r = r > 255 ? 255 : r;
+                r = r < 0 ? 0 : r;
 
-                g = (int)(c * Math.pow(g / 255f, gamma) * 255f);
-                g = g > 255? 255: g;
-                g = g < 0? 0: g;
+                g = (int) (c * Math.pow(g / 255f, gamma) * 255f);
+                g = g > 255 ? 255 : g;
+                g = g < 0 ? 0 : g;
 
-                b = (int)(c * Math.pow(b / 255f, gamma) * 255f);
-                b = b > 255? 255: b;
-                b = b < 0? 0: b;
+                b = (int) (c * Math.pow(b / 255f, gamma) * 255f);
+                b = b > 255 ? 255 : b;
+                b = b < 0 ? 0 : b;
 
                 color = (r << 16) | (g << 8) | b;
 
@@ -344,26 +355,27 @@ class ImageManager {
     }
 
     public void setTemperature(int rTemp, int gTemp, int bTemp) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         for (int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
+            for (int x = 0; x < width; x++) {
                 int color = img.getRGB(x, y);
                 int r = (color >> 16) & 0xff;
                 int g = (color >> 8) & 0xff;
                 int b = color & 0xff;
 
-                r = (int)(r * (rTemp / 255f));
-                r = r > 255? 255: r;
-                r = r < 0? 0: r;
+                r = (int) (r * (rTemp / 255f));
+                r = r > 255 ? 255 : r;
+                r = r < 0 ? 0 : r;
 
-                g = (int)(g * (gTemp / 255f));
-                g = g > 255? 255: g;
-                g = g < 0? 0: g;
+                g = (int) (g * (gTemp / 255f));
+                g = g > 255 ? 255 : g;
+                g = g < 0 ? 0 : g;
 
-                b = (int)(b * (bTemp / 255f));
-                b = b > 255? 255: b;
-                b = b < 0? 0: b;
+                b = (int) (b * (bTemp / 255f));
+                b = b > 255 ? 255 : b;
+                b = b < 0 ? 0 : b;
 
                 color = (r << 16) | (g << 8) | b;
 
@@ -372,8 +384,9 @@ class ImageManager {
         }
     }
 
-    public int[] getGrayscaleHistogram(){
-        if (img == null) return null;
+    public int[] getGrayscaleHistogram() {
+        if (img == null)
+            return null;
 
         convertToGrayscale();
 
@@ -393,7 +406,8 @@ class ImageManager {
     }
 
     public int[] getColorRedHistogram() {
-        if (img == null)  return null;
+        if (img == null)
+            return null;
 
         int[] histogramRed = new int[256];
 
@@ -410,17 +424,18 @@ class ImageManager {
 
             }
         }
-        
+
         return histogramRed;
     }
 
     public int[] getColorGreenHistogram() {
-        if (img == null)    return null;
+        if (img == null)
+            return null;
 
         int[] histogramGreen = new int[256];
 
         for (int i = 0; i < 256; i++) {
-            histogramGreen [i] = 0;
+            histogramGreen[i] = 0;
         }
 
         for (int y = 0; y < height; y++) {
@@ -437,7 +452,8 @@ class ImageManager {
     }
 
     public int[] getColorBlueHistogram() {
-        if (img == null)    return null;
+        if (img == null)
+            return null;
 
         int[] histogramBlue = new int[256];
 
@@ -459,7 +475,8 @@ class ImageManager {
     }
 
     public void grayscaleHistogramEqualisation() {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         int[] histogram = new int[256];
 
@@ -474,16 +491,14 @@ class ImageManager {
                 int g = (color >> 8) & 0xff;
                 int b = color & 0xff;
 
-
-                int gray = (int)(0.2126*r + 0.7152*g + 0.0722*b);
-
+                int gray = (int) (0.2126 * r + 0.7152 * g + 0.0722 * b);
 
                 histogram[gray]++;
 
             }
         }
 
-        int[] histogramCDF = new int [256];
+        int[] histogramCDF = new int[256];
         int cdfMin = 0;
 
         for (int i = 0; i < 256; i++) {
@@ -491,36 +506,37 @@ class ImageManager {
         }
 
         for (int i = 0; i < 256; i++) {
-            if (i == 0) histogramCDF[i] = histogram[i];
-            else histogramCDF[i] = histogramCDF[i-1] + histogram[i];
-            if (histogram[i] > 0 && cdfMin == 0)    cdfMin = i;
+            if (i == 0)
+                histogramCDF[i] = histogram[i];
+            else
+                histogramCDF[i] = histogramCDF[i - 1] + histogram[i];
+            if (histogram[i] > 0 && cdfMin == 0)
+                cdfMin = i;
         }
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-            int color = img.getRGB(x, y);
+                int color = img.getRGB(x, y);
 
-            int r = (color >> 16) & 0xff;
-            int g = (color >> 8) & 0xff;
-            int b = color & 0xff;
+                int r = (color >> 16) & 0xff;
+                int g = (color >> 8) & 0xff;
+                int b = color & 0xff;
 
+                int gray = (int) (0.2126 * r + 0.7152 * g + 0.0722 * b);
 
-            int gray = (int)(0.2126*r + 0.7152*g + 0.0722*b);
+                gray = (int) Math.round(255.0 * (histogramCDF[gray] - cdfMin) / (width * height - cdfMin));
+                gray = gray > 255 ? 255 : gray;
+                gray = gray < 0 ? 0 : gray;
 
-
-            gray = (int)Math.round(255.0*(histogramCDF[gray] - cdfMin)/(width*height-cdfMin));
-            gray = gray > 255? 255: gray;
-            gray = gray < 0? 0: gray;
-
-
-            color = (gray << 16) | (gray << 8) | gray;
-            img.setRGB(x, y, color);
+                color = (gray << 16) | (gray << 8) | gray;
+                img.setRGB(x, y, color);
             }
         }
     }
 
     public void colorHistogramEqualisation() {
-        if (img == null)    return;
+        if (img == null)
+            return;
 
         int[] histogramRed = new int[256];
         int[] histogramGreen = new int[256];
@@ -528,7 +544,7 @@ class ImageManager {
 
         for (int i = 0; i < 256; i++) {
             histogramRed[i] = 0;
-            histogramGreen [i] = 0;
+            histogramGreen[i] = 0;
             histogramBlue[i] = 0;
         }
 
@@ -538,7 +554,6 @@ class ImageManager {
                 int r = (color >> 16) & 0xff;
                 int g = (color >> 8) & 0xff;
                 int b = color & 0xff;
-
 
                 histogramRed[r]++;
                 histogramGreen[g]++;
@@ -555,23 +570,31 @@ class ImageManager {
 
         for (int i = 0; i < 256; i++) {
             histogramRedCDF[i] = 0;
-            histogramGreenCDF [i] = 0;
+            histogramGreenCDF[i] = 0;
             histogramBlueCDF[i] = 0;
         }
 
         for (int i = 0; i < 256; i++) {
-            if (histogramRed[i] > 0 && histogramRedMin == 0)  histogramRedMin = i;
-            if (i == 0)  histogramRedCDF[i] = histogramRed[i];
-            else  histogramRedCDF[i] = histogramRedCDF[i - 1] + histogramRed[i];
-            
-            if (histogramGreen[i] > 0 && histogramGreenMin == 0)  histogramGreenMin = i;
-            if (i == 0)  histogramGreenCDF[i] = histogramGreen[i];
-            else  histogramGreenCDF[i] = histogramGreenCDF[i - 1] + histogramGreen[i];
+            if (histogramRed[i] > 0 && histogramRedMin == 0)
+                histogramRedMin = i;
+            if (i == 0)
+                histogramRedCDF[i] = histogramRed[i];
+            else
+                histogramRedCDF[i] = histogramRedCDF[i - 1] + histogramRed[i];
 
+            if (histogramGreen[i] > 0 && histogramGreenMin == 0)
+                histogramGreenMin = i;
+            if (i == 0)
+                histogramGreenCDF[i] = histogramGreen[i];
+            else
+                histogramGreenCDF[i] = histogramGreenCDF[i - 1] + histogramGreen[i];
 
-            if (histogramBlue[i] > 0 && histogramBlueMin == 0)  histogramBlueMin = i;
-            if (i == 0)  histogramBlueCDF[i] = histogramBlue[i];
-            else  histogramBlueCDF[i] = histogramBlueCDF[i - 1] + histogramBlue[i];
+            if (histogramBlue[i] > 0 && histogramBlueMin == 0)
+                histogramBlueMin = i;
+            if (i == 0)
+                histogramBlueCDF[i] = histogramBlue[i];
+            else
+                histogramBlueCDF[i] = histogramBlueCDF[i - 1] + histogramBlue[i];
         }
 
         for (int y = 0; y < height; y++) {
@@ -581,23 +604,22 @@ class ImageManager {
                 int g = (color >> 8) & 0xff;
                 int b = color & 0xff;
 
-                r = (int)(255.0 * (histogramRedCDF[r] - histogramRedCDF[histogramRedMin])/(pixelNum - histogramRedCDF[histogramRedMin]));
-                r = r > 255? 255: r;
-                r = r < 0? 0: r;
+                r = (int) (255.0 * (histogramRedCDF[r] - histogramRedCDF[histogramRedMin])
+                        / (pixelNum - histogramRedCDF[histogramRedMin]));
+                r = r > 255 ? 255 : r;
+                r = r < 0 ? 0 : r;
 
+                g = (int) (255.0 * (histogramGreenCDF[g] - histogramGreenCDF[histogramGreenMin])
+                        / (pixelNum - histogramGreenCDF[histogramGreenMin]));
+                g = g > 255 ? 255 : g;
+                g = g < 0 ? 0 : g;
 
-                g = (int)(255.0 * (histogramGreenCDF[g] - histogramGreenCDF[histogramGreenMin])/(pixelNum - histogramGreenCDF[histogramGreenMin]));
-                g = g > 255? 255: g;
-                g = g < 0? 0: g;
-
-
-                b = (int)(255.0 * (histogramBlueCDF[b] - histogramBlueCDF[histogramBlueMin])/(pixelNum - histogramBlueCDF[histogramBlueMin]));
-                b = b > 255? 255: b;
-                b = b < 0? 0: b;
-
+                b = (int) (255.0 * (histogramBlueCDF[b] - histogramBlueCDF[histogramBlueMin])
+                        / (pixelNum - histogramBlueCDF[histogramBlueMin]));
+                b = b > 255 ? 255 : b;
+                b = b < 0 ? 0 : b;
 
                 color = (r << 16) | (g << 8) | b;
-
 
                 img.setRGB(x, y, color);
             }
@@ -618,7 +640,8 @@ class ImageManager {
     }
 
     public void averagingFilter(int size) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         if (size % 2 == 0) {
             System.out.println("Size Invalid: must be odd number!");
@@ -647,19 +670,19 @@ class ImageManager {
                 }
 
                 sumRed /= (size * size);
-                sumRed = sumRed > 255? 255: sumRed;
-                sumRed = sumRed < 0? 0: sumRed;
+                sumRed = sumRed > 255 ? 255 : sumRed;
+                sumRed = sumRed < 0 ? 0 : sumRed;
 
                 sumGreen /= (size * size);
-                sumGreen = sumGreen > 255? 255: sumGreen;
-                sumGreen = sumGreen < 0? 0: sumGreen;
+                sumGreen = sumGreen > 255 ? 255 : sumGreen;
+                sumGreen = sumGreen < 0 ? 0 : sumGreen;
 
                 sumBlue /= (size * size);
-                sumBlue = sumBlue > 255? 255: sumBlue;
-                sumBlue = sumBlue < 0? 0: sumBlue;
+                sumBlue = sumBlue > 255 ? 255 : sumBlue;
+                sumBlue = sumBlue < 0 ? 0 : sumBlue;
 
                 int newColor = (sumRed << 16) | (sumGreen << 8) | sumBlue;
-                
+
                 tempBuf.setRGB(x, y, newColor);
             }
         }
@@ -672,7 +695,8 @@ class ImageManager {
     }
 
     public void medianFilter(int size) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         if (size % 2 == 0) {
             System.out.println("Size Invalid: must be odd number");
@@ -701,7 +725,7 @@ class ImageManager {
                             kernelGreen[(i - (y - size / 2)) * size + (j - (x - size / 2))] = g;
                             kernelBlue[(i - (y - size / 2)) * size + (j - (x - size / 2))] = b;
                         }
-                    }   
+                    }
                 }
 
                 for (int i = 0; i < size * size - 1; i++) {
@@ -728,7 +752,8 @@ class ImageManager {
                     }
                 }
 
-                int newColor = (kernelRed[(size * size) / 2 + 1] << 16) | (kernelGreen[(size * size) / 2 + 1] << 8) | (kernelBlue[(size * size) / 2 + 1]);
+                int newColor = (kernelRed[(size * size) / 2 + 1] << 16) | (kernelGreen[(size * size) / 2 + 1] << 8)
+                        | (kernelBlue[(size * size) / 2 + 1]);
 
                 tempBuf.setRGB(x, y, newColor);
             }
@@ -742,7 +767,8 @@ class ImageManager {
     }
 
     public void gaussianFilter(int size, double sigma) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         if (size % 2 == 0) {
             System.out.println("Size Invalid: must be odd number!");
@@ -753,7 +779,7 @@ class ImageManager {
         BufferedImage tempBuf = new BufferedImage(width, height, img.getType());
 
         for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++){
+            for (int x = 0; x < width; x++) {
                 double sumR = 0, sumG = 0, sumB = 0;
 
                 for (int i = y - size / 2; i <= y + size / 2; i++) {
@@ -772,21 +798,21 @@ class ImageManager {
                             sumG += g * weight;
                             sumB += b * weight;
                         }
-                    }   
+                    }
                 }
 
-                int newR = (int)sumR;
-                newR = newR > 255? 255: newR;
-                newR = newR < 0? 0: newR;
+                int newR = (int) sumR;
+                newR = newR > 255 ? 255 : newR;
+                newR = newR < 0 ? 0 : newR;
 
-                int newG = (int)sumG;
-                newG = newG > 255? 255: newG;
-                newG = newG < 0? 0: newG;
+                int newG = (int) sumG;
+                newG = newG > 255 ? 255 : newG;
+                newG = newG < 0 ? 0 : newG;
 
-                int newB = (int)sumB;
-                newB = newB > 255? 255: newB;
-                newB = newB < 0? 0: newB;
-                
+                int newB = (int) sumB;
+                newB = newB > 255 ? 255 : newB;
+                newB = newB < 0 ? 0 : newB;
+
                 int newColor = (newR << 16) | (newG << 8) | newB;
                 tempBuf.setRGB(x, y, newColor);
             }
@@ -807,7 +833,7 @@ class ImageManager {
             for (int j = 0; j < size; j++) {
                 int x = j - size / 2;
                 int y = i - size / 2;
-                
+
                 double exp = -(x * x + y * y) / (2 * sigma * sigma);
                 double value = Math.exp(exp) / (2 * Math.PI * sigma * sigma);
 
@@ -826,12 +852,13 @@ class ImageManager {
     }
 
     public void laplacian() {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         int[][] filter = {
-            {0, 1, 0},
-            {1, -4, 1},
-            {0, 1, 4}
+                { 0, 1, 0 },
+                { 1, -4, 1 },
+                { 0, 1, 4 }
         };
 
         BufferedImage tempBuf = new BufferedImage(width, height, img.getType());
@@ -853,9 +880,9 @@ class ImageManager {
                     }
                 }
 
-                int edge = (int)sum;
-                edge = edge > 255? 255: edge;
-                edge = edge < 0? 0: edge;
+                int edge = (int) sum;
+                edge = edge > 255 ? 255 : edge;
+                edge = edge < 0 ? 0 : edge;
 
                 int newColor = (edge << 16) | (edge << 8) | edge;
 
@@ -871,7 +898,8 @@ class ImageManager {
     }
 
     public void unsharpMasking(int k) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         int size = 3;
         ImageManager tempBur = new ImageManager(img);
@@ -896,18 +924,18 @@ class ImageManager {
                 int maskR = rO - rB;
                 int maskG = gO - gB;
                 int maskB = bO - bB;
-                
+
                 int unsharpR = rO + k * maskR;
-                unsharpR = unsharpR > 255? 255: unsharpR;
-                unsharpR = unsharpR < 0? 0: unsharpR;
+                unsharpR = unsharpR > 255 ? 255 : unsharpR;
+                unsharpR = unsharpR < 0 ? 0 : unsharpR;
 
                 int unsharpG = gO + k * maskG;
-                unsharpG = unsharpG > 255? 255: unsharpG;
-                unsharpG = unsharpG < 0? 0: unsharpG;
+                unsharpG = unsharpG > 255 ? 255 : unsharpG;
+                unsharpG = unsharpG < 0 ? 0 : unsharpG;
 
                 int unsharpB = bO + k * maskB;
-                unsharpB = unsharpB > 255? 255: unsharpB;
-                unsharpB = unsharpB < 0? 0: unsharpB;
+                unsharpB = unsharpB > 255 ? 255 : unsharpB;
+                unsharpB = unsharpB < 0 ? 0 : unsharpB;
 
                 colorOriginal = (unsharpR << 16) | (unsharpG << 8) | unsharpB;
 
@@ -925,11 +953,12 @@ class ImageManager {
     }
 
     public void addSaltNoise(double percent) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         double noOfPX = height * width;
 
-        int noiseAdded = (int)(percent * noOfPX);
+        int noiseAdded = (int) (percent * noOfPX);
 
         Random rnd = new Random();
 
@@ -944,11 +973,12 @@ class ImageManager {
     }
 
     public void addPepperNoise(double percent) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         double noOfPX = height * width;
 
-        int noiseAdded = (int)(percent * noOfPX);
+        int noiseAdded = (int) (percent * noOfPX);
 
         Random rnd = new Random();
 
@@ -963,11 +993,12 @@ class ImageManager {
     }
 
     public void addUniformNoise(double percent, int distribution) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         double noOfPX = height * width;
 
-        int noiseAdded = (int)(percent * noOfPX);
+        int noiseAdded = (int) (percent * noOfPX);
 
         Random rnd = new Random();
 
@@ -979,8 +1010,8 @@ class ImageManager {
             int gray = color & 0xff;
 
             gray += (rnd.nextInt(distribution * 2) - distribution);
-            gray = gray > 255? 255: gray;
-            gray = gray < 0? 0: gray;
+            gray = gray > 255 ? 255 : gray;
+            gray = gray < 0 ? 0 : gray;
 
             int newColor = gray << 16 | gray << 8 | gray;
 
@@ -989,7 +1020,8 @@ class ImageManager {
     }
 
     public void contraharmonicFilter(int size, double Q) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         if (size % 2 == 0) {
             System.out.println("Size Invalid: must be odd number!");
@@ -1005,7 +1037,7 @@ class ImageManager {
 
                 for (int i = y - size / 2; i <= y + size / 2; i++) {
                     for (int j = x - size / 2; j <= x + size / 2; j++) {
-                        if (i >= 0&& i < height && j >= 0 && j < width) {
+                        if (i >= 0 && i < height && j >= 0 && j < width) {
                             int color = img.getRGB(j, i);
                             int r = (color >> 16) & 0xff;
                             int g = (color >> 8) & 0xff;
@@ -1023,18 +1055,18 @@ class ImageManager {
                 }
 
                 sumRedAbove /= sumRedBelow;
-                sumRedAbove = sumRedAbove > 255? 255: sumRedAbove;
-                sumRedAbove = sumBlueAbove < 0 ? 0: sumRedAbove;
+                sumRedAbove = sumRedAbove > 255 ? 255 : sumRedAbove;
+                sumRedAbove = sumBlueAbove < 0 ? 0 : sumRedAbove;
 
                 sumGreenAbove /= sumGreenBelow;
-                sumGreenAbove = sumGreenAbove > 255? 255: sumGreenAbove;
-                sumGreenAbove = sumGreenAbove < 0? 0: sumGreenAbove;
+                sumGreenAbove = sumGreenAbove > 255 ? 255 : sumGreenAbove;
+                sumGreenAbove = sumGreenAbove < 0 ? 0 : sumGreenAbove;
 
                 sumBlueAbove /= sumBlueBelow;
-                sumBlueAbove = sumBlueAbove > 255? 255: sumBlueAbove;
-                sumBlueAbove = sumBlueAbove < 0? 0: sumBlueAbove;
+                sumBlueAbove = sumBlueAbove > 255 ? 255 : sumBlueAbove;
+                sumBlueAbove = sumBlueAbove < 0 ? 0 : sumBlueAbove;
 
-                int newColor = ((int)sumRedAbove << 16) | ((int)sumGreenAbove << 8) | (int)sumBlueAbove;
+                int newColor = ((int) sumRedAbove << 16) | ((int) sumGreenAbove << 8) | (int) sumBlueAbove;
 
                 tempBuf.setRGB(x, y, newColor);
             }
@@ -1048,7 +1080,8 @@ class ImageManager {
     }
 
     public void alphaTrimmedFilter(int size, int d) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         if (size % 2 == 0) {
             System.out.println("Size Invalid: must be odd number!");
@@ -1064,7 +1097,7 @@ class ImageManager {
                 int[] kernelBlue = new int[size * size];
 
                 for (int i = y - size / 2; i <= y + size / 2; i++) {
-                    for (int j = x - size / 2; j <= x + size / 2; j++)  {
+                    for (int j = x - size / 2; j <= x + size / 2; j++) {
                         int r, g, b, k;
 
                         if (i >= 0 && i < height && j >= 0 && j < width) {
@@ -1076,7 +1109,7 @@ class ImageManager {
                             kernelRed[(i - (y - size / 2)) * size + (j - (x - size / 2))] = r;
                             kernelGreen[(i - (y - size / 2)) * size + (j - (x - size / 2))] = g;
                             kernelBlue[(i - (y - size / 2)) * size + (j - (x - size / 2))] = b;
-                         }
+                        }
                     }
                 }
 
@@ -1114,18 +1147,18 @@ class ImageManager {
                 }
 
                 red /= remainingPixel;
-                red = red > 255? 255: red;
-                red = red < 0? 0: red;
+                red = red > 255 ? 255 : red;
+                red = red < 0 ? 0 : red;
 
                 green /= remainingPixel;
-                green = green > 255? 255: green;
-                green = green < 0? 0: green;
+                green = green > 255 ? 255 : green;
+                green = green < 0 ? 0 : green;
 
                 blue /= remainingPixel;
-                blue = blue > 255? 255: blue;
-                blue = blue < 0? 0: blue;
+                blue = blue > 255 ? 255 : blue;
+                blue = blue < 0 ? 0 : blue;
 
-                int newColor = (red << 16) | (green << 8) |  blue;
+                int newColor = (red << 16) | (green << 8) | blue;
 
                 tempBuf.setRGB(x, y, newColor);
             }
@@ -1139,10 +1172,11 @@ class ImageManager {
     }
 
     public void resizeNearestNeighbour(double scaleX, double scaleY) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
-        int newWidth = (int)Math.round(width * scaleX);
-        int newHeight = (int)Math.round(height * scaleY);
+        int newWidth = (int) Math.round(width * scaleX);
+        int newHeight = (int) Math.round(height * scaleY);
 
         BufferedImage tempBuf = new BufferedImage(newWidth, newWidth, img.getType());
 
@@ -1150,13 +1184,13 @@ class ImageManager {
             for (int x = 0; x < newWidth; x++) {
                 int xNearest = (int) Math.round(x / scaleX);
                 int yNearest = (int) Math.round(y / scaleY);
-                
-                xNearest = xNearest >= width? width - 1: xNearest;
-                xNearest = xNearest < 0? 0: xNearest;
-                
-                yNearest = yNearest >= height? height - 1: yNearest;
-                yNearest = yNearest < 0? 0: yNearest;
-                
+
+                xNearest = xNearest >= width ? width - 1 : xNearest;
+                xNearest = xNearest < 0 ? 0 : xNearest;
+
+                yNearest = yNearest >= height ? height - 1 : yNearest;
+                yNearest = yNearest < 0 ? 0 : yNearest;
+
                 tempBuf.setRGB(x, y, img.getRGB(xNearest, yNearest));
             }
         }
@@ -1165,8 +1199,7 @@ class ImageManager {
         width = newWidth;
         height = newHeight;
 
-        for (int y = 0; y < newHeight; y++)
-        {
+        for (int y = 0; y < newHeight; y++) {
             for (int x = 0; x < newWidth; x++) {
                 img.setRGB(x, y, tempBuf.getRGB(x, y));
             }
@@ -1174,10 +1207,11 @@ class ImageManager {
     }
 
     public void resizeBilinear(double scaleX, double scaleY) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
-        int newWidth = (int)Math.round(width * scaleX);
-        int newHeight = (int)Math.round(height * scaleY);
+        int newWidth = (int) Math.round(width * scaleX);
+        int newHeight = (int) Math.round(height * scaleY);
 
         BufferedImage tempBuf = new BufferedImage(newWidth, newHeight, img.getType());
 
@@ -1186,13 +1220,13 @@ class ImageManager {
                 double oldX = x / scaleX;
                 double oldY = y / scaleY;
 
-                //get 4 coordinates
+                // get 4 coordinates
                 int x1 = Math.min((int) Math.floor(oldX), width - 1);
                 int y1 = Math.min((int) Math.floor(oldY), height - 1);
                 int x2 = Math.min((int) Math.ceil(oldX), width - 1);
                 int y2 = Math.min((int) Math.ceil(oldY), height - 1);
 
-                //get colours
+                // get colours
                 int color11 = img.getRGB(x1, y1);
                 int r11 = (color11 >> 16) & 0xff;
                 int g11 = (color11 >> 8) & 0xff;
@@ -1213,7 +1247,7 @@ class ImageManager {
                 int g22 = (color22 >> 8) & 0xff;
                 int b22 = color22 & 0xff;
 
-                //interpolate x
+                // interpolate x
                 double P1r = (x2 - oldX) * r11 + (oldX - x1) * r21;
                 double P1g = (x2 - oldX) * g11 + (oldX - x1) * g21;
                 double P1b = (x2 - oldX) * b11 + (oldX - x1) * b21;
@@ -1226,13 +1260,13 @@ class ImageManager {
                     P1r = r11;
                     P1g = g11;
                     P1b = b11;
-                    
+
                     P2r = r22;
                     P2g = g22;
                     P2b = b22;
                 }
 
-                //interpolate y
+                // interpolate y
                 double Pr = (y2 - oldY) * P1r + (oldY - y1) * P2r;
                 double Pg = (y2 - oldY) * P1g + (oldY - y1) * P2g;
                 double Pb = (y2 - oldY) * P1b + (oldY - y1) * P2b;
@@ -1244,16 +1278,16 @@ class ImageManager {
                 }
 
                 int r = (int) Math.round(Pr);
-                r = r > 255? 255: r;
-                r = r < 0? 0: r;
+                r = r > 255 ? 255 : r;
+                r = r < 0 ? 0 : r;
 
                 int g = (int) Math.round(Pg);
-                g = g > 255? 255: g;
-                g = g < 0? 0: g;
+                g = g > 255 ? 255 : g;
+                g = g < 0 ? 0 : g;
 
                 int b = (int) Math.round(Pb);
-                b = b > 255? 255: b;
-                b = b < 0? 0: b;
+                b = b > 255 ? 255 : b;
+                b = b < 0 ? 0 : b;
 
                 int newColor = (r << 16) | (g << 8) | b;
                 tempBuf.setRGB(x, y, newColor);
@@ -1272,7 +1306,8 @@ class ImageManager {
     }
 
     public void erosion(StructuringElement se) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         convertToGrayscale();
 
@@ -1296,9 +1331,9 @@ class ImageManager {
                                 if (se.elements[seCurrentX][seCurrentY] != gray) {
                                     isEroded = false;
                                     break se_check;
-                                }
-                                else if (min > gray) min = gray;
-                                }
+                                } else if (min > gray)
+                                    min = gray;
+                            }
                         } else {
                             isEroded = false;
                             break se_check;
@@ -1323,9 +1358,10 @@ class ImageManager {
             }
         }
     }
-    
-    public void dilation (StructuringElement se) {
-        if (img == null) return;
+
+    public void dilation(StructuringElement se) {
+        if (img == null)
+            return;
 
         convertToGrayscale();
 
@@ -1334,8 +1370,10 @@ class ImageManager {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 boolean isDialated = false;
-                se_check: for (int i = y - (se.height - se.origin.y - 1); i < y + se.height - (se.height - se.origin.y - 1); i++) {
-                    for (int j = x - (se.width - se.origin.x - 1); j < x + se.width - (se.width - se.origin.x - 1); j++) {
+                se_check: for (int i = y - (se.height - se.origin.y - 1); i < y + se.height
+                        - (se.height - se.origin.y - 1); i++) {
+                    for (int j = x - (se.width - se.origin.x - 1); j < x + se.width
+                            - (se.width - se.origin.x - 1); j++) {
                         int seCurrentX = se.width - (j - x + se.origin.x) - 1;
                         int seCurrentY = se.height - (i - y + se.origin.y) - 1;
 
@@ -1358,14 +1396,17 @@ class ImageManager {
 
                 if (isDialated) {
                     int max = Integer.MIN_VALUE;
-                    
-                    for (int i = y - (se.height - se.origin.y - 1); i < y + se.height - (se.height - se.origin.y - 1); i++) {
-                        for (int j = x - (se.width - se.origin.x - 1); j < x + se.width - (se.width - se.origin.x - 1); j++) {
+
+                    for (int i = y - (se.height - se.origin.y - 1); i < y + se.height
+                            - (se.height - se.origin.y - 1); i++) {
+                        for (int j = x - (se.width - se.origin.x - 1); j < x + se.width
+                                - (se.width - se.origin.x - 1); j++) {
                             if (i >= 0 && i < height && j >= 0 && j < width) {
                                 int color = img.getRGB(j, i);
                                 int gray = color & 0xff;
 
-                                if (max < gray) max = gray;
+                                if (max < gray)
+                                    max = gray;
                             }
                         }
                     }
@@ -1385,7 +1426,8 @@ class ImageManager {
     }
 
     public void thresholding(int threshold) {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         convertToGrayscale();
 
@@ -1394,17 +1436,18 @@ class ImageManager {
                 int color = img.getRGB(x, y);
                 int gray = color & 0xff;
 
-                gray = gray < threshold? 0: 255;
+                gray = gray < threshold ? 0 : 255;
 
                 color = (gray << 16) | (gray << 8) | gray;
 
                 img.setRGB(x, y, color);
-            }   
+            }
         }
     }
 
     public void otsuThresholding() {
-        if (img == null) return;
+        if (img == null)
+            return;
 
         convertToGrayscale();
 
@@ -1445,7 +1488,8 @@ class ImageManager {
         int countMax = 0;
 
         for (int i = 0; i < 256; i++) {
-            float variance = (float) Math.pow(globalMean * histogramCS[i] - histogramMean[i], 2) / (histogramCS[i] * (1 - histogramCS[i]));
+            float variance = (float) Math.pow(globalMean * histogramCS[i] - histogramMean[i], 2)
+                    / (histogramCS[i] * (1 - histogramCS[i]));
 
             if (variance > maxVariance) {
                 maxVariance = variance;
@@ -1457,6 +1501,57 @@ class ImageManager {
             }
         }
         thresholding((int) Math.round(max));
+    }
+
+    public void linearSpatialFilter(double[] kernel, int size) {
+        if (img == null)
+            return;
+
+        if (size % 2 == 0) {
+            System.out.println("Size Invalid: must be odd number!");
+            return;
+        }
+
+        BufferedImage tempBuf = new BufferedImage(width, height, img.getType());
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double sumRed = 0, sumGreen = 0, sumBlue = 0;
+
+                for (int i = y - size / 2; i <= y + size / 2; i++) {
+                    for (int j = x - size / 2; j <= x + size / 2; j++) {
+                        if (i >= 0 && i < height && j >= 0 && j < width) {
+                            int color = img.getRGB(j, i);
+                            int r = (color >> 16) & 0xff;
+                            int g = (color >> 8) & 0xff;
+                            int b = color & 0xff;
+
+                            sumRed += r * kernel[(i - (y - size / 2)) * size + (j - (x - size / 2))];
+                            sumGreen += g * kernel[(i - (y - size / 2)) * size + (j - (x - size / 2))];
+                            sumBlue += b * kernel[(i - (y - size / 2)) * size + (j - (x - size / 2))];
+                        }
+                    }
+                }
+
+                sumRed = sumRed > 255 ? 255 : sumRed;
+                sumRed = sumRed < 0 ? 0 : sumRed;
+
+                sumGreen = sumGreen > 255 ? 255 : sumGreen;
+                sumGreen = sumGreen < 0 ? 0 : sumGreen;
+
+                sumBlue = sumBlue > 255 ? 255 : sumBlue;
+                sumBlue = sumBlue < 0 ? 0 : sumBlue;
+
+                int newColor = ((int) sumRed << 16) | ((int) sumGreen << 8) | (int) sumBlue;
+                tempBuf.setRGB(x, y, newColor);
+            }
+        }
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                img.setRGB(x, y, tempBuf.getRGB(x, y));
+            }
+        }
     }
 
     class StructuringElement {
@@ -1473,10 +1568,10 @@ class ImageManager {
 
             // check boundary
             if (origin.x < 0 || origin.x >= width ||
-                origin.y < 0 || origin.y >= height) {
-                    this.origin = new Point();
+                    origin.y < 0 || origin.y >= height) {
+                this.origin = new Point();
             } else {
-                this.origin = new Point(origin); 
+                this.origin = new Point(origin);
             }
 
             ignoreElements = new ArrayList<>();
