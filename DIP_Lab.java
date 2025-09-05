@@ -7,7 +7,7 @@ public class DIP_Lab {
         ImageManager im = new ImageManager();
         
         // Mandril
-        // im.read("images/mandril.bmp");
+        im.read("images/mandril.bmp");
 
         // Mandril black&white
         // im.read("images/mandrilB.bmp");
@@ -22,7 +22,7 @@ public class DIP_Lab {
         // im.read("images/Rect3.bmp");
 
         // motion
-        im.read("images/images/4/motion01.512.bmp");
+        // im.read("images/images/4/motion01.512.bmp");
 
         // quest1(im);
         // quest2(im);
@@ -40,7 +40,8 @@ public class DIP_Lab {
         // quest12(im);
         // quest13(im);
         // quest14(im);
-        quest15(im);
+        // quest15(im);
+        quest16(im);
     }
 
     public static void quest1(ImageManager im) {
@@ -252,4 +253,14 @@ public class DIP_Lab {
         im.ADIAbsolute(sequences, 25, 50);
         im.write("images/motionAbsolute.bmp");
     }
+
+    public static void quest16(ImageManager im) {
+        im.detectHarrisFeatures(1000);
+        im.write("images/mandrilHarrisFeatures1000.bmp");
+
+        im.restoreToOriginal();
+        im.detectHarrisFeatures(2000);
+        im.write("images/mandrilHarrisFeatures2000.bmp");
+    }
+
 }
