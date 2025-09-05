@@ -1840,6 +1840,61 @@ class ImageManager {
         }
     }
 
+    public void ADIAbsolute(String[] sequences, int threshold, int step) {
+        if (img == null)
+            return;
+
+        BufferedImage tempBuf = new BufferedImage(width, height, img.getType());
+
+        for (int n = 0; n < sequences.length; n++) {
+            BufferedImage otherImage = null;
+            try {
+                otherImage = ImageIO.read(new File(sequences[n]));
+
+            } catch (IOException e) {
+                System.out.println(e);
+                return;
+            }
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int color1 = img.getRGB(x, y);
+                    int r1 = (color1 >> 16) & 0xff;
+                    int g1 = (color1 >> 8) & 0xff;
+                    int b1 = color1 & 0xff;
+                    
+                    int color2 = otherImage.getRGB(x, y);
+                    int r2 = (color2 >> 16) & 0xff;
+                    int g2 = (color2 >> 8) & 0xff;
+                    int b2 = color2 & 0xff;
+                    
+                    int dr = r1 - r2;
+                    int dg = g1 - g2;
+                    int db = b1 - b2;
+                    
+                    int dGray = (int) Math.round(0.2126 * dr + 0.7152 * dg + 0.0722 * db);
+                    
+                    if (Math.abs(dGray) > threshold) {
+                        int currentColor = tempBuf.getRGB(x, y) & 0xff;
+                        currentColor += step;
+                        currentColor = currentColor > 255 ? 255 : currentColor;
+                        currentColor = currentColor < 0 ? 0 : currentColor;
+
+                        int newColor = (currentColor << 16) | (currentColor << 8) | currentColor;
+
+                        tempBuf.setRGB(x, y, newColor);
+                    }
+                }
+            }
+        }
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                img.setRGB(x, y, tempBuf.getRGB(x, y));
+            }
+        }
+    }
+
     class StructuringElement {
         public int[][] elements;
 
