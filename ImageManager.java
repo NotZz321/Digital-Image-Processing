@@ -1711,7 +1711,7 @@ class ImageManager {
         }
     }
 
-    public void houghtTransform(double percent) {
+    public void houghTransform(double percent) {
         // The image should be converted to edge map first
 
         // Work out how the hough space is quantized
