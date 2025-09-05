@@ -1554,6 +1554,163 @@ class ImageManager {
         }
     }
 
+    public void cannyEdgeDetection(int lower, int upper) {
+        // Step 1 - Apply 5 x 5 Gaussian filter
+
+        double[] gaussian = { 2.0 / 159.0, 4.0 / 159.0, 5.0 / 159.0, 4.0 / 159.0, 2.0 / 159.0,
+                4.0 / 159.0, 9.0 / 159.0, 12.0 / 159.0, 9.0 / 159.0, 4.0 / 159.0,
+                5.0 / 159.0, 12.0 / 159.0, 15.0 / 159.0, 12.0 / 159.0, 5.0 / 159.0,
+                4.0 / 159.0, 9.0 / 159.0, 12.0 / 159.0, 9.0 / 159.0, 4.0 / 159.0,
+                2.0 / 159.0, 4.0 / 159.0, 5.0 / 159.0, 4.0 / 159.0, 2.0 / 159.0 };
+
+        linearSpatialFilter(gaussian, 5);
+
+        convertToGrayscale();
+
+        // Step 2 - Find intensity gradient
+        double[] sobelX = { 1, 0, -1,
+                2, 0, -2,
+                1, 0, -1 };
+        double[] sobelY = { 1, 2, 1,
+                0, 0, 0,
+                -1, -2, -1 };
+
+        double[][] magnitude = new double[height][width];
+        double[][] direction = new double[height][width];
+
+        for (int y = 3; y < height - 3; y++) {
+            for (int x = 3; x < width - 3; x++) {
+                double gx = 0, gy = 0;
+                for (int i = y - 1; i <= y + 1; i++) {
+                    for (int j = x - 1; j <= x + 1; j++) {
+                        if (i >= 0 && i < height && j >= 0 && j < width) {
+                            int color = img.getRGB(j, i);
+                            int gray = color & 0xff;
+
+                            gx += gray * sobelX[(i - (y - 1)) * 3 + (j - (x - 1))];
+                            gy += gray * sobelY[(i - (y - 1)) * 3 + (j - (x - 1))];
+                        }
+                    }
+                }
+
+                magnitude[y][x] = Math.sqrt(gx * gx + gy * gy);
+                direction[y][x] = Math.atan2(gy, gx) * 180 / Math.PI;
+            }
+        }
+
+        // Step 3 - Nonmaxima Suppression
+        double[][] gn = new double[height][width];
+
+        for (int y = 3; y < height - 3; y++) {
+            for (int x = 3; x < width - 3; x++) {
+                int targetX = 0, targetY = 0;
+                // find closest direction
+                if (direction[y][x] <= -157.5) {
+                    targetX = 1;
+                    targetY = 0;
+                } else if (direction[y][x] <= -112.5) {
+                    targetX = 1;
+                    targetY = -1;
+                } else if (direction[y][x] <= -67.5) {
+                    targetX = 0;
+                    targetY = 1;
+                } else if (direction[y][x] <= -22.5) {
+                    targetX = 1;
+                    targetY = 1;
+                } else if (direction[y][x] <= 22.5) {
+                    targetX = 1;
+                    targetY = 0;
+                } else if (direction[y][x] <= 67.5) {
+                    targetX = 1;
+                    targetY = -1;
+                } else if (direction[y][x] <= 112.5) {
+                    targetX = 0;
+                    targetY = 1;
+                } else if (direction[y][x] <= 157.5) {
+                    targetX = 1;
+                    targetY = 1;
+                } else {
+                    targetX = 1;
+                    targetY = 0;
+                }
+
+                if (y + targetY >= 0 && y + targetY < height &&
+                        x + targetX >= 0 && x + targetX < width &&
+                        magnitude[y][x] < magnitude[y + targetY][x + targetX]) {
+                    gn[y][x] = 0;
+                } else if (y - targetY >= 0 && y - targetY < height &&
+                        x - targetX >= 0 && x - targetX < width &&
+                        magnitude[y][x] < magnitude[y - targetY][x - targetX]) {
+                    gn[y][x] = 0;
+                } else {
+                    gn[y][x] = magnitude[y][x];
+                }
+            }
+        }
+
+        // Step 4 - Hysteresis Thresholding
+
+        // set back first
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int newGray = (int) gn[y][x];
+                newGray = newGray > 255 ? 255 : newGray;
+                newGray = newGray < 0 ? 0 : newGray;
+                int newColor = (newGray << 16) | (newGray << 8) | newGray;
+                img.setRGB(x, y, newColor);
+            }
+        }
+
+        // upper threshold checking with recursive
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int checking = img.getRGB(x, y) & 0xff;
+                if (checking >= upper) {
+                    checking = 255;
+                    int newColor = (checking << 16) | (checking << 8) | checking;
+                    img.setRGB(x, y, newColor);
+                    hystConnect(x, y, lower);
+                }
+            }
+        }
+
+        // clear unwanted values
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int checking = img.getRGB(x, y) & 0xff;
+                if (checking != 255) {
+                    int newColor = (0 << 16) | (0 << 8) | 0;
+                    img.setRGB(x, y, newColor);
+                }
+            }
+        }
+    }
+
+    private void hystConnect(int x, int y, int threshold) {
+        int value = 0;
+        for (int i = y - 1; i <= y + 1; i++) {
+            for (int j = x - 1; j <= x + 1; j++) {
+                if ((j < width) && (i < height) &&
+                        (j >= 0) && (i >= 0) &&
+                        (j != x) && (i != y)) {
+                    value = img.getRGB(j, i) & 0xff;
+                    if (value != 255) {
+                        if (value >= threshold) {
+                            int newColor = (255 << 16) | (255 << 8) | 255;
+                            img.setRGB(j, i, newColor);
+                            hystConnect(j, i, threshold);
+                        } else {
+
+                            int newColor = (0 << 16) | (0 << 8) | 0;
+                            img.setRGB(j, i, newColor);
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     class StructuringElement {
         public int[][] elements;
 
