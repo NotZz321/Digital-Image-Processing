@@ -1841,8 +1841,7 @@ class ImageManager {
     }
 
     public void ADIAbsolute(String[] sequences, int threshold, int step) {
-        if (img == null)
-            return;
+        if (img == null) return;
 
         BufferedImage tempBuf = new BufferedImage(width, height, img.getType());
 
@@ -1877,6 +1876,7 @@ class ImageManager {
                     if (Math.abs(dGray) > threshold) {
                         int currentColor = tempBuf.getRGB(x, y) & 0xff;
                         currentColor += step;
+                        
                         currentColor = currentColor > 255 ? 255 : currentColor;
                         currentColor = currentColor < 0 ? 0 : currentColor;
 
