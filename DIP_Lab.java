@@ -22,10 +22,10 @@ public class DIP_Lab {
         // im.read("images/Rect3.bmp");
 
         // motion
-        // im.read("images/images/4/motion01.512.bmp");
+        im.read("images/images/4/motion01.512.bmp");
 
         // qr
-        im.read("images/qrcode.bmp");
+        // im.read("images/qrcode.bmp");
 
         // quest1(im);
         // quest2(im);
@@ -43,9 +43,9 @@ public class DIP_Lab {
         // quest12(im);
         // quest13(im);
         // quest14(im);
-        // quest15(im);
+        quest15(im);
         // quest16(im);
-        quest17_quest18(im);
+        // quest17_quest18(im);
     }
 
     public static void quest1(ImageManager im) {
@@ -254,7 +254,7 @@ public class DIP_Lab {
             "images/images/4/motion10.512.bmp",
         };
 
-        im.ADIAbsolute(sequences, 25, 50);
+        im.ADINegative(sequences, 25, 50);
         im.write("images/motionAbsolute.bmp");
     }
 
